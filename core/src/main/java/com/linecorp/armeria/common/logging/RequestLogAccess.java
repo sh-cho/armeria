@@ -18,9 +18,10 @@ package com.linecorp.armeria.common.logging;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import org.jspecify.annotations.Nullable;
+
 import com.linecorp.armeria.common.Request;
 import com.linecorp.armeria.common.RequestContext;
-import com.linecorp.armeria.common.annotation.Nullable;
 import com.linecorp.armeria.common.annotation.UnstableApi;
 
 /**
@@ -229,6 +230,13 @@ public interface RequestLogAccess {
      * @throws IllegalArgumentException if {@code properties} is empty.
      */
     RequestLog ensureAvailable(Iterable<RequestLogProperty> properties);
+
+    /**
+     * Adds the specified {@link RequestLogListener} which will be invoked when a {@link RequestLogProperty}
+     * becomes available.
+     */
+    @UnstableApi
+    void addListener(RequestLogListener listener);
 
     /**
      * Returns the {@link RequestLog} for the {@link Request}, where all properties may not be available yet.

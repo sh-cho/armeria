@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,13 +36,13 @@ import com.google.protobuf.Struct;
 
 import com.linecorp.armeria.client.ClientRequestContext;
 import com.linecorp.armeria.client.Endpoint;
-import com.linecorp.armeria.common.annotation.Nullable;
 import com.linecorp.armeria.xds.ClusterSnapshot;
 
 import io.envoyproxy.envoy.config.cluster.v3.Cluster;
 import io.envoyproxy.envoy.config.cluster.v3.Cluster.LbSubsetConfig;
 import io.envoyproxy.envoy.config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetFallbackPolicy;
 import io.envoyproxy.envoy.config.cluster.v3.Cluster.LbSubsetConfig.LbSubsetSelector;
+import io.envoyproxy.envoy.config.core.v3.Locality;
 import io.envoyproxy.envoy.config.endpoint.v3.LbEndpoint;
 
 final class SubsetLoadBalancer implements LoadBalancer {
@@ -55,6 +56,7 @@ final class SubsetLoadBalancer implements LoadBalancer {
     private final PrioritySet localPrioritySet;
 
     private final Map<Struct, LoadBalancer> subsetLoadBalancers;
+    private final Map<Struct, LoadBalancerState> subsetStates;
     private final LbSubsetConfig lbSubsetConfig;
     private final LbSubsetFallbackPolicy fallbackPolicy;
 
@@ -70,6 +72,7 @@ final class SubsetLoadBalancer implements LoadBalancer {
         fallbackPolicy = lbSubsetFallbackPolicy(lbSubsetConfig);
 
         subsetLoadBalancers = createSubsetLoadBalancers(prioritySet);
+        subsetStates = ImmutableMap.copyOf(subsetLoadBalancers);
     }
 
     private static LbSubsetFallbackPolicy lbSubsetFallbackPolicy(LbSubsetConfig lbSubsetConfig) {
@@ -144,5 +147,40 @@ final class SubsetLoadBalancer implements LoadBalancer {
                           .add("subsetLoadBalancers", subsetLoadBalancers)
                           .add("allEndpointsLoadBalancer", allEndpointsLoadBalancer)
                           .toString();
+    }
+
+    @Override
+    public Map<Integer, HostSet> hostSets() {
+        return allEndpointsLoadBalancer.hostSets();
+    }
+
+    @Override
+    public Map<Integer, Boolean> perPriorityPanic() {
+        return allEndpointsLoadBalancer.perPriorityPanic();
+    }
+
+    @Override
+    public Map<Integer, Integer> healthyPriorityLoad() {
+        return allEndpointsLoadBalancer.healthyPriorityLoad();
+    }
+
+    @Override
+    public Map<Integer, Integer> degradedPriorityLoad() {
+        return allEndpointsLoadBalancer.degradedPriorityLoad();
+    }
+
+    @Override
+    public Map<Locality, Double> zarResidualPercentages() {
+        return allEndpointsLoadBalancer.zarResidualPercentages();
+    }
+
+    @Override
+    public double zarLocalPercentage() {
+        return allEndpointsLoadBalancer.zarLocalPercentage();
+    }
+
+    @Override
+    public Map<Struct, LoadBalancerState> subsetStates() {
+        return subsetStates;
     }
 }

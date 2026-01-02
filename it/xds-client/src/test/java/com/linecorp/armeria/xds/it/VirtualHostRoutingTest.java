@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.stream.Stream;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -34,7 +35,6 @@ import com.linecorp.armeria.common.HttpHeaderNames;
 import com.linecorp.armeria.common.HttpMethod;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.RequestHeaders;
-import com.linecorp.armeria.common.annotation.Nullable;
 import com.linecorp.armeria.xds.XdsBootstrap;
 import com.linecorp.armeria.xds.client.endpoint.XdsHttpPreprocessor;
 
@@ -50,6 +50,7 @@ class VirtualHostRoutingTest {
                       api_listener:
                         "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager\
                 .v3.HttpConnectionManager
+                        stat_prefix: http
                         route_config:
                           name: local_route
                           virtual_hosts:
@@ -75,6 +76,7 @@ class VirtualHostRoutingTest {
                   - name: my-cluster1
                     type: STATIC
                     load_assignment:
+                      cluster_name: my-cluster1
                       endpoints:
                       - lb_endpoints:
                         - endpoint:
@@ -85,6 +87,7 @@ class VirtualHostRoutingTest {
                   - name: my-cluster2
                     type: STATIC
                     load_assignment:
+                      cluster_name: my-cluster2
                       endpoints:
                       - lb_endpoints:
                         - endpoint:
@@ -161,6 +164,7 @@ class VirtualHostRoutingTest {
                       api_listener:
                         "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager\
                 .v3.HttpConnectionManager
+                        stat_prefix: http
                         route_config:
                           name: local_route
                           ignore_port_in_host_matching: true
@@ -185,6 +189,7 @@ class VirtualHostRoutingTest {
                   - name: my-cluster1
                     type: STATIC
                     load_assignment:
+                      cluster_name: my-cluster1
                       endpoints:
                       - lb_endpoints:
                         - endpoint:
@@ -195,6 +200,7 @@ class VirtualHostRoutingTest {
                   - name: my-cluster2
                     type: STATIC
                     load_assignment:
+                      cluster_name: my-cluster2
                       endpoints:
                       - lb_endpoints:
                         - endpoint:
@@ -247,6 +253,7 @@ class VirtualHostRoutingTest {
                   api_listener:
                     "@type": type.googleapis.com/envoy.extensions.filters.network.http_connection_manager\
             .v3.HttpConnectionManager
+                    stat_prefix: http
                     route_config:
                       name: local_route
                       virtual_hosts:

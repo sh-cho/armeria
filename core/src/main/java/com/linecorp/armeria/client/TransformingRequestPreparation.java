@@ -22,6 +22,7 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Publisher;
 
 import com.google.errorprone.annotations.FormatMethod;
@@ -34,7 +35,6 @@ import com.linecorp.armeria.common.HttpMethod;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.MediaType;
-import com.linecorp.armeria.common.annotation.Nullable;
 import com.linecorp.armeria.common.annotation.UnstableApi;
 
 import io.netty.util.AttributeKey;
@@ -83,6 +83,13 @@ public class TransformingRequestPreparation<T, R> implements WebRequestPreparati
     @Override
     public TransformingRequestPreparation<T, R> responseTimeoutMode(ResponseTimeoutMode responseTimeoutMode) {
         delegate.responseTimeoutMode(responseTimeoutMode);
+        return this;
+    }
+
+    @Override
+    @UnstableApi
+    public TransformingRequestPreparation<T, R> clientTlsSpec(ClientTlsSpec clientTlsSpec) {
+        delegate.clientTlsSpec(clientTlsSpec);
         return this;
     }
 

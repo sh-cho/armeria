@@ -18,12 +18,13 @@ package com.linecorp.armeria.client;
 
 import java.time.Duration;
 
+import org.jspecify.annotations.Nullable;
+
 import com.linecorp.armeria.common.ExchangeType;
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.Request;
 import com.linecorp.armeria.common.Response;
-import com.linecorp.armeria.common.annotation.Nullable;
 import com.linecorp.armeria.common.annotation.UnstableApi;
 
 import io.netty.util.AttributeKey;
@@ -165,4 +166,11 @@ public interface RequestOptionsSetters {
      * @see ResponseTimeoutMode
      */
     RequestOptionsSetters responseTimeoutMode(ResponseTimeoutMode responseTimeoutMode);
+
+    /**
+     * Sets the request-specific TLS configuration for this request.
+     * If not set, the {@link ClientFactory} default TLS configurations will be used.
+     */
+    @UnstableApi
+    RequestOptionsSetters clientTlsSpec(ClientTlsSpec clientTlsSpec);
 }

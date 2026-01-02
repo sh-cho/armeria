@@ -19,9 +19,9 @@ import static com.google.common.base.Preconditions.checkState;
 
 import java.time.Duration;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.extension.ExtensionContext;
 
-import com.linecorp.armeria.common.annotation.Nullable;
 import com.linecorp.armeria.common.util.Exceptions;
 import com.linecorp.armeria.internal.testing.TemporaryFolder;
 import com.linecorp.armeria.testing.junit5.common.AbstractAllOrEachExtension;
@@ -33,7 +33,7 @@ import zookeeperjunit.ZooKeeperAssert;
 
 public class ZooKeeperExtension extends AbstractAllOrEachExtension implements ZooKeeperAssert {
 
-    private static final Duration duration = Duration.ofSeconds(10);
+    private static final Duration duration = Duration.ofSeconds(60);
     private static final TemporaryFolder tempFolder = new TemporaryFolder();
 
     @Nullable

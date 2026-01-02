@@ -21,15 +21,14 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.jspecify.annotations.Nullable;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.protobuf.Any;
-import com.google.protobuf.Duration;
 import com.google.protobuf.UInt32Value;
 import com.google.protobuf.Value;
 import com.google.protobuf.util.Durations;
-
-import com.linecorp.armeria.common.annotation.Nullable;
 
 import io.envoyproxy.envoy.config.bootstrap.v3.Bootstrap;
 import io.envoyproxy.envoy.config.bootstrap.v3.Bootstrap.DynamicResources;
@@ -225,6 +224,7 @@ public final class XdsTestResources {
                 .setDynamicResources(DynamicResources
                                              .newBuilder()
                                              .setCdsConfig(configSource)
+                                             .setLdsConfig(configSource)
                                              .setAdsConfig(configSource.getApiConfigSource())
                 )
                 .build();
@@ -277,7 +277,6 @@ public final class XdsTestResources {
     public static Cluster createCluster(String clusterName, int connectTimeoutSeconds) {
         final ConfigSource edsSource =
                 ConfigSource.newBuilder()
-                            .setInitialFetchTimeout(Duration.newBuilder().setSeconds(0))
                             .setAds(AggregatedConfigSource.getDefaultInstance())
                             .setResourceApiVersion(ApiVersion.V3)
                             .build();
@@ -343,7 +342,9 @@ public final class XdsTestResources {
 
     public static Listener exampleListener(String listenerName, String routeName) {
         final HttpConnectionManager manager =
-                httpConnectionManager(Rds.newBuilder().setRouteConfigName(routeName).build());
+                httpConnectionManager(Rds.newBuilder().setRouteConfigName(routeName)
+                                         .setConfigSource(adsConfigSource())
+                                         .build());
         return exampleListener(listenerName, manager);
     }
 

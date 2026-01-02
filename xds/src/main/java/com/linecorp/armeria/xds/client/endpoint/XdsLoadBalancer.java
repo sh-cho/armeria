@@ -21,10 +21,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 
+import org.jspecify.annotations.Nullable;
+
 import com.linecorp.armeria.client.ClientRequestContext;
 import com.linecorp.armeria.client.Endpoint;
 import com.linecorp.armeria.client.endpoint.EndpointSelector;
-import com.linecorp.armeria.common.annotation.Nullable;
 import com.linecorp.armeria.common.annotation.UnstableApi;
 import com.linecorp.armeria.xds.ClusterSnapshot;
 
@@ -46,8 +47,9 @@ public interface XdsLoadBalancer extends EndpointSelector {
      * {@link Endpoint}s.
      */
     static UpdatableXdsLoadBalancer of(EventExecutor eventLoop, Locality locality,
-                                       @Nullable XdsLoadBalancer localLoadBalancer) {
-        return new DefaultXdsLoadBalancer(eventLoop, locality, localLoadBalancer);
+                                       @Nullable XdsLoadBalancer localLoadBalancer,
+                                       XdsLoadBalancerLifecycleObserver lifecycleObserver) {
+        return new DefaultXdsLoadBalancer(eventLoop, locality, localLoadBalancer, lifecycleObserver);
     }
 
     @Override

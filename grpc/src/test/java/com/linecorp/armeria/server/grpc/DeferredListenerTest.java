@@ -26,8 +26,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -110,7 +109,6 @@ class DeferredListenerTest {
         CompletableFuture.runAsync(task, executor).join();
     }
 
-    @NotNull
     private static UnaryServerCall<SimpleRequest, SimpleResponse> newServerCall(
             EventLoop eventLoop, @Nullable Executor blockingTaskExecutor) {
         final ServiceRequestContext ctx = ServiceRequestContext.builder(HttpRequest.of(HttpMethod.POST, "/"))

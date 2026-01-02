@@ -17,16 +17,18 @@
 package com.linecorp.armeria.common;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
 import java.util.Map;
 import java.util.Set;
 
+import org.jspecify.annotations.Nullable;
+
 import com.google.common.base.Ascii;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Sets;
 
-import com.linecorp.armeria.common.annotation.Nullable;
 import com.linecorp.armeria.common.annotation.UnstableApi;
 
 /**
@@ -204,6 +206,24 @@ public enum SessionProtocol {
      */
     public int defaultPort() {
         return defaultPort;
+    }
+
+    /**
+     * Returns the equivalent protocol which supports TLS.
+     */
+    @UnstableApi
+    public SessionProtocol withTls() {
+        checkState(this != PROXY, "Unsupported protocol: %s", this);
+        if (isTls()) {
+            return this;
+        }
+        if (isExplicitHttp1()) {
+            return H1;
+        } else if (isExplicitHttp2()) {
+            return H2;
+        } else {
+            return HTTPS;
+        }
     }
 
     @Override

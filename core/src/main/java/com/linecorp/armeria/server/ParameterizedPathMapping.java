@@ -28,13 +28,14 @@ import java.util.StringJoiner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jspecify.annotations.Nullable;
+
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 import com.linecorp.armeria.common.Flags;
-import com.linecorp.armeria.common.annotation.Nullable;
 
 /**
  * The default {@link PathMapping} implementation. It holds three things:
@@ -119,6 +120,10 @@ final class ParameterizedPathMapping extends AbstractPathMapping {
             checkArgument(pathPattern.indexOf(';') < 0,
                           "pathPattern: %s (expected not to have a ';')", pathPattern);
         }
+        checkArgument(!hasQueryString(pathPattern),
+                      "pathPattern: %s must not contain a query string. " +
+                      "Use 'RouteBuilder.matchesParams()' instead.", pathPattern);
+
         this.prefix = prefix;
         requireNonNull(pathPattern, "pathPattern");
 

@@ -35,6 +35,8 @@ import java.util.function.Supplier;
 
 import javax.annotation.Nonnull;
 
+import org.jspecify.annotations.Nullable;
+
 import com.google.errorprone.annotations.MustBeClosed;
 
 import com.linecorp.armeria.client.ClientRequestContext;
@@ -51,7 +53,6 @@ import com.linecorp.armeria.common.Request;
 import com.linecorp.armeria.common.RequestContext;
 import com.linecorp.armeria.common.Response;
 import com.linecorp.armeria.common.RpcRequest;
-import com.linecorp.armeria.common.annotation.Nullable;
 import com.linecorp.armeria.common.annotation.UnstableApi;
 import com.linecorp.armeria.common.util.BlockingTaskExecutor;
 import com.linecorp.armeria.common.util.DomainSocketAddress;
@@ -220,7 +221,7 @@ public interface ServiceRequestContext extends RequestContext {
      *   <li>the thread-local does not have any {@link RequestContext} in it</li>
      *   <li>the thread-local has the same {@link ServiceRequestContext} as this - reentrance</li>
      *   <li>the thread-local has the {@link ClientRequestContext} whose {@link ClientRequestContext#root()}
-     *       is the same {@link ServiceRequestContext} as this</li>
+     *       is {@code null} or the same {@link ServiceRequestContext} as this</li>
      * </ul>
      * Otherwise, this method will throw an {@link IllegalStateException}.
      */
@@ -230,6 +231,10 @@ public interface ServiceRequestContext extends RequestContext {
         final RequestContext oldCtx = RequestContextUtil.getAndSet(this);
         if (oldCtx == null) {
             return RequestContextUtil.invokeHookAndPop(this, null);
+        }
+
+        if (oldCtx.root() == null) {
+            return RequestContextUtil.invokeHookAndPop(this, oldCtx);
         }
 
         if (oldCtx.unwrapAll() == unwrapAll()) {

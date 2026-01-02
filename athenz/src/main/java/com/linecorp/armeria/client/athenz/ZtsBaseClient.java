@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.LoggerFactory;
 
 import com.linecorp.armeria.client.ClientFactory;
@@ -38,7 +39,6 @@ import com.linecorp.armeria.client.retry.RetryingClient;
 import com.linecorp.armeria.common.CommonPools;
 import com.linecorp.armeria.common.TlsKeyPair;
 import com.linecorp.armeria.common.TlsProvider;
-import com.linecorp.armeria.common.annotation.Nullable;
 import com.linecorp.armeria.common.annotation.UnstableApi;
 import com.linecorp.armeria.common.logging.LogLevel;
 import com.linecorp.armeria.common.logging.LogWriter;
@@ -120,11 +120,7 @@ public final class ZtsBaseClient implements SafeCloseable {
         }
         clientFactory = factoryBuilder.build();
         this.webClientConfigurer = webClientConfigurer;
-        defaultWebClient = webClient(builder -> {
-            if (webClientConfigurer != null) {
-                webClientConfigurer.accept(builder);
-            }
-        });
+        defaultWebClient = webClient(builder -> {});
     }
 
     /**

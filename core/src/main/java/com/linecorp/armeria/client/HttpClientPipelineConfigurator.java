@@ -37,6 +37,7 @@ import java.util.function.Consumer;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLException;
 
+import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
@@ -49,7 +50,6 @@ import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.RequestId;
 import com.linecorp.armeria.common.RequestTarget;
 import com.linecorp.armeria.common.SessionProtocol;
-import com.linecorp.armeria.common.annotation.Nullable;
 import com.linecorp.armeria.common.logging.ClientConnectionTimingsBuilder;
 import com.linecorp.armeria.common.util.Exceptions;
 import com.linecorp.armeria.common.util.SystemInfo;
@@ -160,7 +160,7 @@ final class HttpClientPipelineConfigurator extends ChannelDuplexHandler {
 
     HttpClientPipelineConfigurator(HttpClientFactory clientFactory,
                                    boolean webSocket, SessionProtocol sessionProtocol,
-                                   SslContext sslCtx) {
+                                   @Nullable SslContext sslCtx) {
         this.clientFactory = clientFactory;
         this.webSocket = webSocket;
 
@@ -176,6 +176,7 @@ final class HttpClientPipelineConfigurator extends ChannelDuplexHandler {
         }
 
         if (sessionProtocol.isTls()) {
+            assert sslCtx != null;
             this.sslCtx = sslCtx;
             http1 = H1;
             http2 = H2;

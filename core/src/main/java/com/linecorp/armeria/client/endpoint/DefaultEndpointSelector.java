@@ -18,9 +18,10 @@ package com.linecorp.armeria.client.endpoint;
 
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
+
 import com.linecorp.armeria.client.ClientRequestContext;
 import com.linecorp.armeria.client.Endpoint;
-import com.linecorp.armeria.common.annotation.Nullable;
 import com.linecorp.armeria.common.loadbalancer.LoadBalancer;
 import com.linecorp.armeria.common.util.ListenableAsyncCloseable;
 import com.linecorp.armeria.internal.common.util.ReentrantShortLock;
@@ -52,7 +53,6 @@ final class DefaultEndpointSelector<T extends LoadBalancer<Endpoint, ClientReque
                 }
             });
         }
-        initialize();
     }
 
     @Override
@@ -70,7 +70,7 @@ final class DefaultEndpointSelector<T extends LoadBalancer<Endpoint, ClientReque
 
     @Nullable
     @Override
-    public Endpoint selectNow(ClientRequestContext ctx) {
+    public Endpoint doSelectNow(ClientRequestContext ctx) {
         final T loadBalancer = this.loadBalancer;
         if (loadBalancer == null) {
             return null;

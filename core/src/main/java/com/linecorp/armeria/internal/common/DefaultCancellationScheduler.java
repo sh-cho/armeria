@@ -23,11 +23,12 @@ import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledFuture;
 
+import org.jspecify.annotations.Nullable;
+
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.math.LongMath;
 
 import com.linecorp.armeria.client.ResponseTimeoutException;
-import com.linecorp.armeria.common.annotation.Nullable;
 import com.linecorp.armeria.common.util.Ticker;
 import com.linecorp.armeria.common.util.TimeoutMode;
 import com.linecorp.armeria.common.util.UnmodifiableFuture;
@@ -271,6 +272,11 @@ final class DefaultCancellationScheduler implements CancellationScheduler {
             scheduledFuture = eventLoop().schedule(() -> invokeTask(null), newTimeoutNanos, NANOSECONDS);
         }
         return ScheduleResult.INVOKE_LATER;
+    }
+
+    @Override
+    public boolean hasEventLoop() {
+        return eventLoop != null;
     }
 
     private EventExecutor eventLoop() {

@@ -23,12 +23,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.annotations.VisibleForTesting;
 
-import com.linecorp.armeria.common.annotation.Nullable;
 import com.linecorp.armeria.common.util.SafeCloseable;
 
 import io.grpc.Status;
@@ -44,8 +44,9 @@ abstract class AbstractRoot<T extends Snapshot<? extends XdsResource>>
     private final Set<SnapshotWatcher<? super T>> snapshotWatchers = new HashSet<>();
     private boolean closed;
 
-    AbstractRoot(EventExecutor eventLoop) {
+    AbstractRoot(EventExecutor eventLoop, SnapshotWatcher<Object> defaultWatcher) {
         this.eventLoop = eventLoop;
+        snapshotWatchers.add(defaultWatcher);
     }
 
     /**
@@ -106,15 +107,15 @@ abstract class AbstractRoot<T extends Snapshot<? extends XdsResource>>
     }
 
     @Override
-    public void onError(XdsType type, Status status) {
+    public void onError(XdsType type, String resourceName, Status status) {
         if (closed) {
             return;
         }
         if (!eventLoop.inEventLoop()) {
-            eventLoop.execute(() -> onError(type, status));
+            eventLoop.execute(() -> onError(type, resourceName, status));
             return;
         }
-        notifyWatchers("onError", watcher -> watcher.onError(type, status));
+        notifyWatchers("onError", watcher -> watcher.onError(type, resourceName, status));
     }
 
     private void notifyWatchers(String methodName, Consumer<SnapshotWatcher<? super T>> consumer) {
@@ -142,5 +143,15 @@ abstract class AbstractRoot<T extends Snapshot<? extends XdsResource>>
     @Override
     public void close() {
         closed = true;
+    }
+
+    static Runnable safeRunnable(Runnable runnable, Consumer<Throwable> onError) {
+        return () -> {
+            try {
+                runnable.run();
+            } catch (Throwable t) {
+                onError.accept(t);
+            }
+        };
     }
 }

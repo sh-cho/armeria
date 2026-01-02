@@ -26,7 +26,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -484,7 +484,6 @@ class GrpcServiceBuilderTest {
                     return null;
                 }
 
-                @Nullable
                 @Override
                 public SimpleRequest getMessagePrototype() {
                     return SimpleRequest.getDefaultInstance();

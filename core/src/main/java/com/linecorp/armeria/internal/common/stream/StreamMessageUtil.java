@@ -16,13 +16,13 @@
 
 package com.linecorp.armeria.internal.common.stream;
 
+import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.linecorp.armeria.common.annotation.Nullable;
 import com.linecorp.armeria.common.multipart.BodyPart;
 import com.linecorp.armeria.common.stream.ByteStreamMessage;
 import com.linecorp.armeria.common.stream.StreamMessage;
@@ -64,7 +64,7 @@ public final class StreamMessageUtil {
             try {
                 ((AutoCloseable) obj).close();
             } catch (Exception e) {
-                logger.warn("Unexpected exception while closing {}", obj);
+                logger.warn("Unexpected exception while closing {}", obj, e);
             }
             return;
         }

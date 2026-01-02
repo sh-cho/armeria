@@ -19,7 +19,7 @@ package com.linecorp.armeria.server;
 import static com.linecorp.armeria.internal.server.RouteUtil.ensureAbsolutePath;
 import static java.util.Objects.requireNonNull;
 
-import com.linecorp.armeria.common.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A skeletal {@link PathMapping} implementation. Implement {@link #doApply(RoutingContext)}.
@@ -40,6 +40,10 @@ abstract class AbstractPathMapping implements PathMapping {
             length -= 1;
         }
         return path.substring(length);
+    }
+
+    static boolean hasQueryString(String path) {
+        return path.indexOf('?') >= 0;
     }
 
     @Override

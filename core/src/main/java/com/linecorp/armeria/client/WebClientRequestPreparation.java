@@ -26,6 +26,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.jspecify.annotations.Nullable;
 import org.reactivestreams.Publisher;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -44,7 +45,6 @@ import com.linecorp.armeria.common.HttpStatus;
 import com.linecorp.armeria.common.JacksonObjectMapperProvider;
 import com.linecorp.armeria.common.MediaType;
 import com.linecorp.armeria.common.ResponseEntity;
-import com.linecorp.armeria.common.annotation.Nullable;
 import com.linecorp.armeria.common.annotation.UnstableApi;
 
 import io.netty.util.AttributeKey;
@@ -400,6 +400,13 @@ public final class WebClientRequestPreparation
     @Override
     public WebClientRequestPreparation responseTimeoutMode(ResponseTimeoutMode responseTimeoutMode) {
         requestOptionsBuilder().responseTimeoutMode(responseTimeoutMode);
+        return this;
+    }
+
+    @Override
+    @UnstableApi
+    public WebClientRequestPreparation clientTlsSpec(ClientTlsSpec clientTlsSpec) {
+        requestOptionsBuilder().clientTlsSpec(clientTlsSpec);
         return this;
     }
 

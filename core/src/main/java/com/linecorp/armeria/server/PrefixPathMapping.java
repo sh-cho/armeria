@@ -24,11 +24,12 @@ import static com.linecorp.armeria.internal.server.RouteUtil.ensureAbsolutePath;
 import java.util.List;
 import java.util.Set;
 
+import org.jspecify.annotations.Nullable;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 import com.linecorp.armeria.common.Flags;
-import com.linecorp.armeria.common.annotation.Nullable;
 
 final class PrefixPathMapping extends AbstractPathMapping {
 
@@ -41,6 +42,8 @@ final class PrefixPathMapping extends AbstractPathMapping {
     PrefixPathMapping(String prefix, boolean stripPrefix) {
         checkArgument(Flags.allowSemicolonInPathComponent() || prefix.indexOf(';') < 0,
                       "prefix: %s (expected not to have a ';')", prefix);
+        checkArgument(!hasQueryString(prefix), "prefix: %s must not contain a query string. " +
+                                               "Use 'RouteBuilder.matchesParams()' instead.", prefix);
         prefix = ensureAbsolutePath(prefix, "prefix");
         if (!prefix.endsWith("/")) {
             prefix += '/';

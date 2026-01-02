@@ -20,6 +20,7 @@ import static com.linecorp.armeria.internal.client.thrift.THttpClientDelegate.de
 import static java.util.Objects.requireNonNull;
 
 import org.apache.thrift.transport.TTransportException;
+import org.jspecify.annotations.Nullable;
 
 import com.linecorp.armeria.client.ClientBuilderParams;
 import com.linecorp.armeria.client.RequestOptions;
@@ -32,7 +33,6 @@ import com.linecorp.armeria.common.HttpMethod;
 import com.linecorp.armeria.common.RequestTarget;
 import com.linecorp.armeria.common.RpcRequest;
 import com.linecorp.armeria.common.RpcResponse;
-import com.linecorp.armeria.common.annotation.Nullable;
 import com.linecorp.armeria.internal.client.ClientUtil;
 import com.linecorp.armeria.internal.client.DefaultClientRequestContext;
 import com.linecorp.armeria.internal.client.TailPreClient;
@@ -89,7 +89,7 @@ final class DefaultTHttpClient extends UserClient<RpcRequest, RpcResponse> imple
         final DefaultClientRequestContext ctx = new DefaultClientRequestContext(
                 scheme().sessionProtocol(), null, HttpMethod.POST, call, reqTarget, endpointGroup(),
                 UNARY_REQUEST_OPTIONS, options(), meterRegistry());
-        return ClientUtil.executeWithFallback(preClient, ctx, call, errorResponseFactory());
+        return ClientUtil.executePreClientWithFallback(preClient, ctx, call, errorResponseFactory());
     }
 
     @Override

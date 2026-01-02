@@ -26,6 +26,7 @@ import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.Executor;
 
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +42,6 @@ import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.ResponseHeaders;
 import com.linecorp.armeria.common.SerializationFormat;
-import com.linecorp.armeria.common.annotation.Nullable;
 import com.linecorp.armeria.common.grpc.GrpcJsonMarshaller;
 import com.linecorp.armeria.common.grpc.GrpcSerializationFormats;
 import com.linecorp.armeria.common.grpc.ThrowableProto;
@@ -118,8 +118,7 @@ public abstract class AbstractServerCall<I, O> extends ServerCall<I, O> {
     private final InternalGrpcExceptionHandler exceptionHandler;
 
     // Only set once.
-    @Nullable
-    private ServerCall.Listener<I> listener;
+    private ServerCall.@Nullable Listener<I> listener;
 
     // Message compression defaults to being enabled unless a user disables it using a server interceptor.
     private boolean messageCompression = true;
@@ -571,6 +570,7 @@ public abstract class AbstractServerCall<I, O> extends ServerCall<I, O> {
     public static HttpHeaders statusToTrailers(
             ServiceRequestContext ctx, HttpHeadersBuilder trailersBuilder,
             Status status, @Nullable Metadata metadata) {
+        trailersBuilder.endOfStream(true);
         try {
             MetadataUtil.fillHeaders(metadata, trailersBuilder);
         } catch (Exception e) {
@@ -594,6 +594,8 @@ public abstract class AbstractServerCall<I, O> extends ServerCall<I, O> {
         final HttpHeaders additionalTrailers = ctx.additionalResponseTrailers();
         ctx.mutateAdditionalResponseTrailers(HttpHeadersBuilder::clear);
         trailersBuilder.add(additionalTrailers);
+        // Remove content-length just in case it was set mistakenly.
+        trailersBuilder.remove(HttpHeaderNames.CONTENT_LENGTH);
         return trailersBuilder.build();
     }
 

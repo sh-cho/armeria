@@ -22,6 +22,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -40,7 +41,6 @@ import com.linecorp.armeria.common.Flags;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.HttpStatus;
 import com.linecorp.armeria.common.SessionProtocol;
-import com.linecorp.armeria.common.annotation.Nullable;
 import com.linecorp.armeria.server.ServerBuilder;
 import com.linecorp.armeria.testing.junit5.server.ServerExtension;
 
@@ -89,12 +89,11 @@ class ClientRequestContextDelayedInitTest {
 
                 protected TestEndpointSelector(EndpointGroup endpointGroup) {
                     super(endpointGroup);
-                    initialize();
                 }
 
                 @Nullable
                 @Override
-                public Endpoint selectNow(ClientRequestContext ctx) {
+                public Endpoint doSelectNow(ClientRequestContext ctx) {
                     if (counter.getAndIncrement() >= failAfter) {
                         throw cause;
                     }

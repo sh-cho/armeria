@@ -52,6 +52,7 @@ import org.joda.time.DateTime;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -89,6 +90,7 @@ import org.opensaml.xmlsec.signature.support.SignatureConstants;
 
 import net.shibboleth.utilities.java.support.resolver.CriteriaSet;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 
 import com.linecorp.armeria.client.WebClient;
@@ -104,7 +106,6 @@ import com.linecorp.armeria.common.MediaType;
 import com.linecorp.armeria.common.QueryParams;
 import com.linecorp.armeria.common.QueryParamsBuilder;
 import com.linecorp.armeria.common.RequestHeaders;
-import com.linecorp.armeria.common.annotation.Nullable;
 import com.linecorp.armeria.common.util.UnmodifiableFuture;
 import com.linecorp.armeria.internal.common.util.SelfSignedCertificate;
 import com.linecorp.armeria.internal.testing.GenerateNativeImageTrace;
@@ -276,8 +277,11 @@ class SamlServiceProviderTest {
         public CompletionStage<Void> beforeInitiatingSso(ServiceRequestContext ctx, HttpRequest req,
                                                          MessageContext<AuthnRequest> message,
                                                          SamlIdentityProviderConfig idpConfig) {
-            message.getSubcontext(SAMLBindingContext.class, true)
-                   .setRelayState(req.path());
+            final SAMLBindingContext subcontext = message.getSubcontext(SAMLBindingContext.class, true);
+            assert subcontext != null;
+            if (req.path().length() <= 80) {
+                subcontext.setRelayState(req.path());
+            }
             return UnmodifiableFuture.completedFuture(null);
         }
 
@@ -341,6 +345,21 @@ class SamlServiceProviderTest {
 
         assertThat(QueryParams.fromQueryString(location)
                               .get(SIGNATURE_ALGORITHM)).isEqualTo(signatureAlgorithm);
+    }
+
+    @Test
+    void relayStateExceeding80BytesShouldNotBeSent() throws Exception {
+        final String meaninglessQuery = Strings.repeat("12345678910", 10);
+
+        final AggregatedHttpResponse resp = client.get("/redirect?a=" + meaninglessQuery).aggregate().join();
+        assertThat(resp.status()).isEqualTo(HttpStatus.FOUND);
+
+        final String location = resp.headers().get(HttpHeaderNames.LOCATION);
+        final Pattern p = Pattern.compile(
+                "http://idp\\.example\\.com/saml/sso/redirect\\?" +
+                "SAMLRequest=([^&]+)&SigAlg=([^&]+)&Signature=(.+)$");
+        assertThat(location).isNotNull();
+        assertThat(p.matcher(location).matches()).isTrue();
     }
 
     @Test

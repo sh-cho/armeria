@@ -24,6 +24,8 @@ import java.nio.charset.Charset;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import org.jspecify.annotations.Nullable;
+
 import com.linecorp.armeria.client.ClientRequestContext;
 import com.linecorp.armeria.client.HttpClient;
 import com.linecorp.armeria.client.SimpleDecoratingHttpClient;
@@ -34,7 +36,6 @@ import com.linecorp.armeria.common.RequestContext;
 import com.linecorp.armeria.common.RequestHeaders;
 import com.linecorp.armeria.common.Response;
 import com.linecorp.armeria.common.ResponseHeaders;
-import com.linecorp.armeria.common.annotation.Nullable;
 import com.linecorp.armeria.common.logging.ContentPreviewer;
 import com.linecorp.armeria.common.logging.ContentPreviewerFactory;
 import com.linecorp.armeria.common.logging.RequestLog;
@@ -68,7 +69,6 @@ public final class ContentPreviewingClient extends SimpleDecoratingHttpClient {
      * {@link RequestHeaders} or {@link ResponseHeaders} meets any of the following conditions:
      * <ul>
      *     <li>when it matches {@code text/*} or {@code application/x-www-form-urlencoded}</li>
-     *     <li>when its charset has been specified</li>
      *     <li>when its subtype is {@code "xml"} or {@code "json"}</li>
      *     <li>when its subtype ends with {@code "+xml"} or {@code "+json"}</li>
      * </ul>
@@ -86,7 +86,6 @@ public final class ContentPreviewingClient extends SimpleDecoratingHttpClient {
      * {@link RequestHeaders} or {@link ResponseHeaders} meets any of the following conditions:
      * <ul>
      *     <li>when it matches {@code text/*} or {@code application/x-www-form-urlencoded}</li>
-     *     <li>when its charset has been specified</li>
      *     <li>when its subtype is {@code "xml"} or {@code "json"}</li>
      *     <li>when its subtype ends with {@code "+xml"} or {@code "+json"}</li>
      * </ul>

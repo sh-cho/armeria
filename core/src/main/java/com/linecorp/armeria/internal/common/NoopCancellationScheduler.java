@@ -18,7 +18,8 @@ package com.linecorp.armeria.internal.common;
 
 import java.util.concurrent.CompletableFuture;
 
-import com.linecorp.armeria.common.annotation.Nullable;
+import org.jspecify.annotations.Nullable;
+
 import com.linecorp.armeria.common.util.TimeoutMode;
 import com.linecorp.armeria.common.util.UnmodifiableFuture;
 
@@ -115,5 +116,10 @@ final class NoopCancellationScheduler implements CancellationScheduler {
     @Override
     public State state() {
         return State.INIT;
+    }
+
+    @Override
+    public boolean hasEventLoop() {
+        return false;
     }
 }

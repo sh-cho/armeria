@@ -20,6 +20,8 @@ import static java.util.Objects.requireNonNull;
 
 import java.util.function.Function;
 
+import org.jspecify.annotations.Nullable;
+
 import com.linecorp.armeria.client.ClientRequestContext;
 import com.linecorp.armeria.client.HttpClient;
 import com.linecorp.armeria.client.SimpleDecoratingHttpClient;
@@ -27,9 +29,7 @@ import com.linecorp.armeria.client.observation.HttpClientObservationDocumentatio
 import com.linecorp.armeria.common.HttpRequest;
 import com.linecorp.armeria.common.HttpResponse;
 import com.linecorp.armeria.common.RequestHeadersBuilder;
-import com.linecorp.armeria.common.annotation.Nullable;
 import com.linecorp.armeria.common.annotation.UnstableApi;
-import com.linecorp.armeria.common.logging.RequestLogProperty;
 import com.linecorp.armeria.internal.common.RequestContextExtension;
 import com.linecorp.armeria.server.observation.ObservationService;
 
@@ -138,24 +138,26 @@ public final class ObservationClient extends SimpleDecoratingHttpClient {
     private static void enrichObservation(ClientRequestContext ctx,
                                           ClientObservationContext clientObservationContext,
                                           Observation observation) {
-        ctx.log()
-           .whenAvailable(RequestLogProperty.REQUEST_FIRST_BYTES_TRANSFERRED_TIME)
-           .thenAccept(requestLog -> observation.event(Events.WIRE_SEND));
-
-        ctx.log()
-           .whenAvailable(RequestLogProperty.RESPONSE_FIRST_BYTES_TRANSFERRED_TIME)
-           .thenAccept(requestLog -> {
-               if (requestLog.responseFirstBytesTransferredTimeNanos() != null) {
-                   observation.event(Events.WIRE_RECEIVE);
-               }
-           });
-
-        ctx.log().whenComplete()
-           .thenAccept(requestLog -> {
-               // TODO: ClientConnectionTimings - there is no way to record events
-               // with a specific timestamp for an observation
-               clientObservationContext.setResponse(requestLog);
-               observation.stop();
-           });
+        ctx.log().addListener((property, log) -> {
+            switch (property) {
+                case REQUEST_FIRST_BYTES_TRANSFERRED_TIME:
+                    observation.event(Events.WIRE_SEND);
+                    break;
+                case RESPONSE_FIRST_BYTES_TRANSFERRED_TIME:
+                    if (log.responseFirstBytesTransferredTimeNanos() != null) {
+                        observation.event(Events.WIRE_RECEIVE);
+                    }
+                    break;
+                case ALL_COMPLETE:
+                    // TODO: ClientConnectionTimings - there is no way to record events
+                    // with a specific timestamp for an observation
+                    clientObservationContext.setResponse(log);
+                    observation.stop();
+                    break;
+                default:
+                    // Do nothing.
+                    break;
+            }
+        });
     }
 }

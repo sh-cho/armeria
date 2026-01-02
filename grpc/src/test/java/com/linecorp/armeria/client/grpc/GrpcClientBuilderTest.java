@@ -23,7 +23,7 @@ import static testing.grpc.Messages.PayloadType.COMPRESSABLE;
 import java.io.InputStream;
 import java.util.stream.Stream;
 
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -279,7 +279,6 @@ class GrpcClientBuilderTest {
                         }
                     }).setResponseMarshaller(
                     new PrototypeMarshaller<O>() {
-                        @Nullable
                         @Override
                         public O getMessagePrototype() {
                             return (O) SimpleResponse.getDefaultInstance();

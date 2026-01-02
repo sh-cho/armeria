@@ -24,11 +24,12 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.jspecify.annotations.Nullable;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 import com.linecorp.armeria.common.Flags;
-import com.linecorp.armeria.common.annotation.Nullable;
 
 final class ExactPathMapping extends AbstractPathMapping {
 
@@ -46,6 +47,10 @@ final class ExactPathMapping extends AbstractPathMapping {
             checkArgument(prefix.indexOf(';') < 0, "prefix: %s (expected not to have a ';')", prefix);
             checkArgument(exactPath.indexOf(';') < 0, "exactPath: %s (expected not to have a ';')", exactPath);
         }
+        checkArgument(!hasQueryString(exactPath),
+                      "exactPath: %s must not contain a query string. " +
+                      "Use 'RouteBuilder.matchesParams()' instead.", exactPath);
+
         this.prefix = prefix;
         ensureAbsolutePath(exactPath, "exactPath");
         exactPath = ESCAPE_COLON.matcher(exactPath).replaceAll("/:");

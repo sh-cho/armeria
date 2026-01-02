@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -42,7 +43,6 @@ import com.linecorp.armeria.client.ClientRequestContext;
 import com.linecorp.armeria.client.Endpoint;
 import com.linecorp.armeria.common.HttpMethod;
 import com.linecorp.armeria.common.HttpRequest;
-import com.linecorp.armeria.common.annotation.Nullable;
 import com.linecorp.armeria.xds.ListenerRoot;
 import com.linecorp.armeria.xds.XdsBootstrap;
 import com.linecorp.armeria.xds.client.endpoint.XdsRandom.RandomHint;
@@ -70,6 +70,7 @@ class PriorityTest {
                                  endpoint("127.0.0.1", 8082));
         final ClusterLoadAssignment loadAssignment =
                 ClusterLoadAssignment.newBuilder()
+                                     .setClusterName("cluster")
                                      .addEndpoints(localityLbEndpoints(
                                              Locality.getDefaultInstance(), lbEndpoints))
                                      .build();
@@ -96,6 +97,7 @@ class PriorityTest {
                                  endpoint("127.0.0.1", 8082, 2));
         final ClusterLoadAssignment loadAssignment =
                 ClusterLoadAssignment.newBuilder()
+                                     .setClusterName("cluster")
                                      .addEndpoints(localityLbEndpoints(
                                              Locality.getDefaultInstance(), lbEndpoints))
                                      .build();
@@ -127,6 +129,7 @@ class PriorityTest {
         final ClusterLoadAssignment loadAssignment =
                 ClusterLoadAssignment
                         .newBuilder()
+                        .setClusterName("cluster")
                         .addEndpoints(localityLbEndpoints(Locality.getDefaultInstance(), lbEndpoints0, 0))
                         .addEndpoints(localityLbEndpoints(Locality.getDefaultInstance(), lbEndpoints1, 1))
                         .build();
@@ -169,6 +172,7 @@ class PriorityTest {
         final ClusterLoadAssignment loadAssignment =
                 ClusterLoadAssignment
                         .newBuilder()
+                        .setClusterName("cluster")
                         .addEndpoints(localityLbEndpoints(Locality.getDefaultInstance(), lbEndpoints0, 0))
                         .addEndpoints(localityLbEndpoints(Locality.getDefaultInstance(), lbEndpoints1, 1))
                         // set overprovisioning factor to 100 for simpler calculation
@@ -213,6 +217,7 @@ class PriorityTest {
         final ClusterLoadAssignment loadAssignment =
                 ClusterLoadAssignment
                         .newBuilder()
+                        .setClusterName("cluster")
                         .addEndpoints(localityLbEndpoints(Locality.getDefaultInstance(), lbEndpoints0, 0))
                         .build();
         final Cluster cluster = createStaticCluster("cluster", loadAssignment)
@@ -248,6 +253,7 @@ class PriorityTest {
         final ClusterLoadAssignment loadAssignment =
                 ClusterLoadAssignment
                         .newBuilder()
+                        .setClusterName("cluster")
                         .addEndpoints(localityLbEndpoints(Locality.getDefaultInstance(), lbEndpoints0, 0))
                         .addEndpoints(localityLbEndpoints(Locality.getDefaultInstance(), lbEndpoints1, 1))
                         .build();
@@ -286,6 +292,7 @@ class PriorityTest {
         final ClusterLoadAssignment loadAssignment =
                 ClusterLoadAssignment
                         .newBuilder()
+                        .setClusterName("cluster")
                         .addEndpoints(localityLbEndpoints(Locality.getDefaultInstance(), lbEndpoints0, 0))
                         .build();
         final Cluster cluster = createStaticCluster("cluster", loadAssignment)
@@ -317,6 +324,7 @@ class PriorityTest {
         final ClusterLoadAssignment loadAssignment =
                 ClusterLoadAssignment
                         .newBuilder()
+                        .setClusterName("cluster")
                         .addEndpoints(localityLbEndpoints(Locality.getDefaultInstance(), lbEndpoints0))
                         .build();
         final Cluster cluster = createStaticCluster("cluster", loadAssignment)
@@ -357,6 +365,7 @@ class PriorityTest {
         final ClusterLoadAssignment loadAssignment =
                 ClusterLoadAssignment
                         .newBuilder()
+                        .setClusterName("cluster")
                         .addEndpoints(localityLbEndpoints(Locality.getDefaultInstance(), lbEndpoints0))
                         .setPolicy(Policy.newBuilder()
                                          .setWeightedPriorityHealth(true))
